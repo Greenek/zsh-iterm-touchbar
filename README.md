@@ -35,7 +35,7 @@ Currently it shows:
 Clone the repo in your plugins directory:
 
 * `$ cd ${ZSH_CUSTOM1:-$ZSH/custom}/plugins`
-* `$ git clone https://github.com/iam4x/zsh-iterm-touchbar.git`
+* `$ git clone https://github.com/mofirouz/zsh-iterm-touchbar.git`
 
 Then add the plugin into your `~/.zshrc`:
 
@@ -48,7 +48,7 @@ plugins=(... zsh-iterm-touchbar)
 Add the following snippet `~/.zshrc` after the line antigen use oh-my-zsh:
 
 ```
-antigen theme https://github.com/iam4x/zsh-iterm-touchbar
+antigen theme https://github.com/mofirouz/zsh-iterm-touchbar
 ```
 
 #### For Zgen users
@@ -56,7 +56,7 @@ antigen theme https://github.com/iam4x/zsh-iterm-touchbar
 Add the following line to your `~/.zshrc` where you're adding your other zsh plugins:
 
 ```
-zgen load iam4x/zsh-iterm-touchbar
+zgen load mofirouz/zsh-iterm-touchbar
 ```
 
 ### Customize
