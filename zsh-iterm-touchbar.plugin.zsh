@@ -7,7 +7,7 @@ GIT_UNPULLED="${GIT_UNPULLED:-⇣}"
 GIT_UNPUSHED="${GIT_UNPUSHED:-⇡}"
 
 # YARN
-YARN_ENABLED=true
+YARN_ENABLED=false
 
 # Output name of current branch.
 git_current_branch() {
@@ -131,28 +131,16 @@ function _displayDefault() {
     indicators+="$(git_stashed)"
     indicators+="$(git_unpushed_unpulled)"
 
-    [ -n "${indicators}" ] && touchbarIndicators="🔥[${indicators}]" || touchbarIndicators="🙌";
+    [ -n "${indicators}" ] && touchbarIndicators="‼️[${indicators}]" || touchbarIndicators="✔️";
 
-    pecho "\033]1337;SetKeyLabel=F2=🎋 $(git_current_branch)\a"
-    pecho "\033]1337;SetKeyLabel=F3=$touchbarIndicators\a"
-    pecho "\033]1337;SetKeyLabel=F4=✉️ push\a";
+    pecho "\033]1337;SetKeyLabel=F2=$touchbarIndicators\a"
+    pecho "\033]1337;SetKeyLabel=F3=🔀 $(git_current_branch)\a"
+    pecho "\033]1337;SetKeyLabel=F4=🔄 pull\a";
 
     # bind git actions
-    bindkey '^[OQ' _displayBranches
-    bindkey -s '^[OR' 'git status \n'
-    bindkey -s '^[OS' "git push origin $(git_current_branch) \n"
-  fi
-
-  # PACKAGE.JSON
-  # ------------
-  if [[ -f package.json ]]; then
-      if [[ -f yarn.lock ]] && [[ "$YARN_ENABLED" = true ]]; then
-          pecho "\033]1337;SetKeyLabel=F5=🐱 yarn-run\a"
-          bindkey "${fnKeys[5]}" _displayYarnScripts
-      else
-          pecho "\033]1337;SetKeyLabel=F5=⚡️ npm-run\a"
-          bindkey "${fnKeys[5]}" _displayNpmScripts
-    fi
+    bindkey -s '^[OQ' 'git status \n'
+    bindkey -s '^[OR' 'git branch --list --all | cat'
+    bindkey -s '^[OS' "git pull --rebase \n"
   fi
 }
 
