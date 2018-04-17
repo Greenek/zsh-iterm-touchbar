@@ -1,8 +1,8 @@
 # GIT
-GIT_UNCOMMITTED="${GIT_UNCOMMITTED:-+}"
-GIT_UNSTAGED="${GIT_UNSTAGED:-!}"
-GIT_UNTRACKED="${GIT_UNTRACKED:-?}"
-GIT_STASHED="${GIT_STASHED:-$}"
+GIT_UNCOMMITTED="${GIT_UNCOMMITTED:-⊕}"
+GIT_UNSTAGED="${GIT_UNSTAGED:-⊙}"
+GIT_UNTRACKED="${GIT_UNTRACKED:-⊗}"
+GIT_STASHED="${GIT_STASHED:-⊘}"
 GIT_UNPULLED="${GIT_UNPULLED:-⇣}"
 GIT_UNPUSHED="${GIT_UNPUSHED:-⇡}"
 
@@ -74,6 +74,16 @@ git_unpushed_unpulled() {
   [ -n $arrows ] && echo -n "${arrows}"
 }
 
+git_diff_shortstat() {
+  local stat
+  stat="$(command git diff --shortstat 2>/dev/null)"
+  (( !$? )) || return
+
+  array=($(echo $stat))
+
+  echo -n "⊡${array[1]} +${array[4]}/-${array[6]}"
+}
+
 pecho() {
   if [ -n "$TMUX" ]
   then
@@ -108,7 +118,7 @@ function _displayDefault() {
 
   # CURRENT_DIR
   # -----------
-  pecho "\033]1337;SetKeyLabel=F1=👉 $(echo $(pwd) | awk -F/ '{print $(NF-1)"/"$(NF)}')\a"
+  pecho "\033]1337;SetKeyLabel=F1=⧂ $(echo $(pwd) | awk -F/ '{print $(NF-1)"/"$(NF)}')\a"
   bindkey -s '^[OP' 'pwd \n'
 
   # GIT
@@ -123,24 +133,28 @@ function _displayDefault() {
     git update-index --really-refresh -q &>/dev/null
 
     # String of indicators
-    local indicators=''
+    local indicators="$(git_diff_shortstat)"
 
-    indicators+="$(git_uncomitted)"
-    indicators+="$(git_unstaged)"
-    indicators+="$(git_untracked)"
-    indicators+="$(git_stashed)"
-    indicators+="$(git_unpushed_unpulled)"
-
-    [ -n "${indicators}" ] && touchbarIndicators="‼️[${indicators}]" || touchbarIndicators="✔️";
+    [ -n "${indicators}" ] && touchbarIndicators="${indicators}" || touchbarIndicators="✓";
 
     pecho "\033]1337;SetKeyLabel=F2=$touchbarIndicators\a"
-    pecho "\033]1337;SetKeyLabel=F3=🔀 $(git_current_branch)\a"
-    pecho "\033]1337;SetKeyLabel=F4=🔄 pull\a";
+    pecho "\033]1337;SetKeyLabel=F3=⋲ $(git_current_branch)\a"
+    pecho "\033]1337;SetKeyLabel=F4=⤓ Pull\a";
 
     # bind git actions
     bindkey -s '^[OQ' 'git status \n'
     bindkey -s '^[OR' 'git branch --list --all | cat'
     bindkey -s '^[OS' "git pull --rebase \n"
+  fi
+
+  if [[ -f package.json ]]; then
+    if [[ -f yarn.lock ]] && [[ "$YARN_ENABLED" = true ]]; then
+      pecho "\033]1337;SetKeyLabel=F5=▶︎ Run\a"
+      bindkey "${fnKeys[5]}" _displayYarnScripts
+    else
+      pecho "\033]1337;SetKeyLabel=F5=▶︎ Run\a"
+      bindkey "${fnKeys[5]}" _displayNpmScripts
+    fi
   fi
 }
 
@@ -163,7 +177,7 @@ function _displayNpmScripts() {
     pecho "\033]1337;SetKeyLabel=F$fnKeysIndex=$npmScript\a"
   done
 
-  pecho "\033]1337;SetKeyLabel=F1=👈 back\a"
+  pecho "\033]1337;SetKeyLabel=F1=↩︎\a"
   bindkey "${fnKeys[1]}" _displayDefault
 }
 
@@ -186,7 +200,7 @@ function _displayYarnScripts() {
     pecho "\033]1337;SetKeyLabel=F$fnKeysIndex=$yarnScript\a"
   done
 
-  pecho "\033]1337;SetKeyLabel=F1=👈 back\a"
+  pecho "\033]1337;SetKeyLabel=F1=↩︎\a"
   bindkey "${fnKeys[1]}" _displayDefault
 }
 
@@ -208,7 +222,7 @@ function _displayBranches() {
     pecho "\033]1337;SetKeyLabel=F$fnKeysIndex=$branch\a"
   done
 
-  pecho "\033]1337;SetKeyLabel=F1=👈 back\a"
+  pecho "\033]1337;SetKeyLabel=F1=↩︎\a"
   bindkey "${fnKeys[1]}" _displayDefault
 }
 
